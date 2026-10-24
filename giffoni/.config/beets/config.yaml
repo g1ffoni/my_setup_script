@@ -1,4 +1,4 @@
-directory: ~/Music/Sorted
+directory: ~/Media/Music/Sorted
 library: ~/.config/beets/musiclibrary.db
 per_disc_numbering: yes
 import:
@@ -10,7 +10,7 @@ paths:
     default: $albumartist/$album%aunique{}/$disc-$track - $title
     singleton: Looses/$artist/$disc-$track - $title
     comp: Compilations/$album%aunique{}/$disc-$track - $title
-    
+
 plugins: musicbrainz fetchart embedart scrub lyrics info
 
 lyrics:
