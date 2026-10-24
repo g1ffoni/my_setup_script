@@ -1,0 +1,18 @@
+#!/bin/sh
+
+state=$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@) || exit 1
+
+case "$state" in
+	*"[MUTED]"*)
+		text="Microphone muted"
+		icon="microphone-sensitivity-muted"
+		;;
+	*)
+		text="Microphone unmuted"
+		icon="microphone-sensitivity-high"
+		;;
+esac
+
+notify-send -t 1000 -a 'wp-mic' -i "$icon" \
+	-h string:x-canonical-private-synchronous:mic \
+	"$text"

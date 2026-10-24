@@ -1,0 +1,9 @@
+#!/bin/sh
+
+day_of_week=$(date '+%A')
+date_str=$(date '+%d %B')
+time_str=$(date '+%H:%M')
+
+notify-send -t 3000 -a 'wp-date' -i appointment-soon \
+	-h string:x-canonical-private-synchronous:date \
+	"$time_str" "$day_of_week, $date_str"

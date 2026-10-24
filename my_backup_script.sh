@@ -14,9 +14,9 @@ while true; do
         sudo mount /dev/sda1 /mnt
 
         log "Backuping files into external hard drive..."
-        rsync -rtv --delete --progress $HOME/.mpdscribble /mnt/
-        rsync -rtv --delete --progress $HOME/Music /mnt/
+        rsync -rtv --delete --progress $HOME/Media /mnt/
         rsync -rtv --delete --progress $HOME/Code /mnt/
+        rsync -rtv --delete --progress $HOME/.mpdscribble /mnt/
 
         log "Unmounting external hard drive..."
         sudo umount /mnt

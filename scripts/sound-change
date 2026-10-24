@@ -1,0 +1,33 @@
+#!/bin/sh
+
+state=$(wpctl get-volume @DEFAULT_AUDIO_SINK@) || exit 1
+percent=$(echo "$state" | awk '{printf "%d", $2 * 100 + 0.5}')
+
+case "$state" in
+	*"[MUTED]"*) muted=1 ;;
+	*) muted=0 ;;
+esac
+
+# Label the output device
+sink_name=$(pactl get-default-sink 2>/dev/null)
+active_port=$(pactl list sinks 2>/dev/null | awk -v s="$sink_name" '
+	$1 == "Name:" { cur = ($2 == s) }
+	cur && /Active Port:/ { print $3; exit }')
+
+case "$sink_name $active_port" in
+	*headphone*|*headset*|*bluez*) label="Headphones" ;;
+	*) label="Speakers" ;;
+esac
+
+# Build the message
+if [ "$muted" -eq 1 ]; then
+	text="$label muted"
+	value=0
+else
+	text="$label: ${percent}%"
+	value=$percent
+fi
+
+notify-send -t 1000 -a 'wp-vol' \
+	-h string:x-canonical-private-synchronous:volume \
+	-h "int:value:$value" "$text"

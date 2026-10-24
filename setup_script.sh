@@ -6,23 +6,23 @@ exec > >(tee output.log) 2>&1
 source "utils.sh"
 
 install_apps() {
-    BASE_PKGS=(git rsync nano fastfetch greetd greetd-agreety fish github-cli micro ttf-firacode-nerd noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra timidity++ mpd mpc ncmpcpp mpdscribble brightnessctl flatpak tree bash-completion uv)
-    DESKTOP_PKGS=(wayland niri xorg xwayland-satellite wl-clipboard fuzzel mako foot polkit-gnome xdg-desktop-portal xdg-desktop-portal-gnome gnome-keyring awww swayidle)
-    APP_PKGS=(firefox zed nicotine+ nautilus vesktop gimp krita steam celluloid loupe seahorse)
+    BASE_PKGS=(git rsync nano fastfetch greetd greetd-agreety fish github-cli micro otf-monaspace-nerd noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra timidity++ mpd mpc ncmpcpp mpdscribble brightnessctl flatpak tree bash-completion uv docker docker-compose)
+    DESKTOP_PKGS=(wayland niri-git xorg xwayland-satellite wl-clipboard fuzzel mako foot polkit-gnome xdg-desktop-portal xdg-desktop-portal-gnome awww swayidle)
+    APP_PKGS=(firefox zed nicotine+ nautilus vesktop gimp krita steam celluloid loupe)
 
     PACMAN_PKGS=("${BASE_PKGS[@]}" "${DESKTOP_PKGS[@]}" "${APP_PKGS[@]}")
     PARU_PKGS=()
-    FLATPAK_PKGS=(io.github.arijanj.Mimic com.stremio.Stremio)
+    FLATPAK_PKGS=()
 
     log "Installing packages..."
     sudo pacman -S --needed "${PACMAN_PKGS[@]}"
     paru -S --needed "${PARU_PKGS[@]}"
     flatpak install -y flathub "${FLATPAK_PKGS[@]}"
-    uv tool install beets
+    #uv tool install beets
     log "Finished installing packages."
 }
 
-configure_apps() {
+configure_stuff() {
     # mpd doesn't create these itself
     mkdir -p "$HOME/.local/share/mpd/playlists"
     mkdir -p "$HOME/.local/state/mpd"
@@ -41,15 +41,16 @@ configure_apps() {
 
     log "Setting up dotfiles..."
     for src in "${SOURCES[@]}"; do
-        if [[ -d "giffoni/${src}" ]]; then
-            install_dotfile "giffoni/${src}" "$HOME/${src}"
-        else
-            warn "Source not found, skipping: $src"
-        fi
+        [[ -e "$HOME/$src" ]] && rm -rf "$HOME/$src"
+        mkdir -p "$(dirname "$HOME/$src")"
+        cp -r "$src" "$HOME/$src"
     done
 
     log "Setting up system config files..."
     sudo cp -vr sys_configs/greetd_config.toml /etc/greetd/config.toml
+
+    log "Setting up bash scripts on PATH..."
+    sudo install -m 755 -o root -g root scripts/* /usr/local/bin/
 
     log "Enabling services..."
     local USER_SERVICES=(mpd mpdscribble)
@@ -63,10 +64,13 @@ configure_apps() {
 
     log "Adding ASCII greeting..."
     sudo cp -vr sys_configs/login_greet.txt /etc/issue
+
     log "Configuring git..."
     git config --global color.ui auto
+
     log "Changing user shell to fish..."
     chsh -s /bin/fish
+
     log "Finished configuring apps."
 }
 
@@ -82,10 +86,9 @@ giffoni_related() {
 
             log "Getting external hard drive files..."
             sudo mount /dev/sda1 /mnt
-            rsync -rtv --progress /mnt/Music/ $HOME/Music/
-            cp -vr /mnt/.mpdscribble $HOME/
-            cp -vr /mnt/Code $HOME/
-
+            rsync -rtv --progress /mnt/Media $HOME/
+            rsync -rtv --progress /mnt/Code $HOME/
+            rsync -rtv --progress /mnt/.mpdscribble $HOME/
             log "Unmounting external hard drive..."
             sudo umount /mnt
 
@@ -123,7 +126,7 @@ giffoni_related() {
 
 check_deps pacman paru git awk sudo
 install_apps
-configure_apps
+configure_stuff
 # not realy using GRUB anymore :p
 # grub_tweaks
 giffoni_related

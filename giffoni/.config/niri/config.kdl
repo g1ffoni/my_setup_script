@@ -1,13 +1,343 @@
-// Check the wiki for a full description of the configuration:
-// https://niri-wm.github.io/niri/Configuration:-Introduction
+input {
+    touchpad {
+        natural-scroll
+        accel-profile "flat"
+        scroll-method "two-finger"
+    }
 
-include "input.kdl"
-include "outputs.kdl"
-include "workspaces.kdl"
-include "keybinds.kdl"
-include "switch-events.kdl"
-include "layout.kdl"
-include "misc.kdl"
-include "recent-windows.kdl"
-include "layer-and-window-rules.kdl"
-include "animations.kdl"
+    mouse {
+        accel-profile "flat"
+        middle-emulation
+         scroll-factor 1.0
+    }
+
+    trackpoint {
+        accel-profile "flat"
+    }
+}
+
+output "eDP-1" {
+
+    mode "1920x1080@60.000"
+    scale 1
+    transform "normal"
+
+}
+
+layout {
+    gaps 16
+    center-focused-column "on-overflow"
+    always-center-single-column
+    default-column-display "normal"
+
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+        proportion 1.0
+    }
+
+    default-column-width { proportion 1.0; }
+
+    preset-window-heights {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+        proportion 1.0
+    }
+
+    focus-ring {
+        width 2
+        active-color "#7f8c98"
+        inactive-color "#7f8c98"
+        urgent-color "#ff8170"
+    }
+
+    border {
+        off
+    }
+
+    shadow {
+        off
+    }
+
+    tab-indicator {
+        off
+    }
+
+    insert-hint {
+        color "#6bdfff80"
+    }
+}
+
+workspace "discord"
+workspace "browser"
+workspace "task"
+workspace "music"
+
+spawn-at-startup "awww-daemon" "--no-cache"
+spawn-at-startup "awww-daemon" "--no-cache" "-n" "-overview"
+spawn-sh-at-startup "while ! awww img ~/Pictures/Wallpapers/wp.* -t fade --transition-fps 60 --transition-bezier '0.25,0.46,0.45,0.94' 2>/dev/null; do sleep 0.1; done"
+spawn-sh-at-startup "while ! awww img ~/Pictures/Wallpapers/wp-overview.* -n=-overview -t fade --transition-fps 60 --transition-bezier '0.25,0.46,0.45,0.94' 2>/dev/null; do sleep 0.1; done"
+
+spawn-at-startup "mako"
+spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
+
+spawn-at-startup "vesktop"
+spawn-at-startup "zeditor"
+spawn-at-startup "firefox"
+spawn-at-startup "foot" "ncmpcpp"
+
+spawn-at-startup "niri" "msg" "action" "focus-workspace" "discord"
+
+spawn-at-startup "gsettings" "set" "org.gnome.desktop.interface" "color-scheme" "prefer-dark"
+spawn-at-startup "gsettings" "set" "org.gnome.desktop.interface" "cursor-size" "40"
+
+spawn-sh-at-startup "swayidle -w timeout 300 'niri msg action power-off-monitors'"
+
+prefer-no-csd
+
+screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
+
+environment {
+	ELECTRON_OZONE_PLATFORM_HINT "wayland"
+}
+
+cursor {
+    xcursor-size 40
+    hide-after-inactive-ms 10000
+}
+
+overview {
+    zoom 0.6
+
+    workspace-shadow {
+        softness 40
+        spread 10
+        offset x=0 y=10
+        color "#00000050"
+    }
+}
+
+xwayland-satellite {
+    // off
+    path "xwayland-satellite"
+}
+
+clipboard {
+    disable-primary
+}
+
+hotkey-overlay {
+    skip-at-startup
+    hide-not-bound
+}
+
+config-notification {
+    disable-failed
+}
+
+blur {
+    // off
+    passes 3
+    offset 3.0
+    noise 0.02
+    saturation 1.5
+}
+
+animations {
+
+    workspace-switch {
+        spring damping-ratio=1.0 stiffness=1000 epsilon=0.0001
+    }
+
+    window-open {
+        duration-ms 150
+        curve "ease-out-expo"
+    }
+
+    window-close {
+        duration-ms 150
+        curve "ease-out-quad"
+    }
+
+    horizontal-view-movement {
+        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+    }
+
+    window-movement {
+        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+    }
+
+    window-resize {
+        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+    }
+
+    config-notification-open-close {
+        spring damping-ratio=0.6 stiffness=1000 epsilon=0.001
+    }
+
+    exit-confirmation-open-close {
+        spring damping-ratio=0.6 stiffness=500 epsilon=0.01
+    }
+
+    screenshot-ui-open {
+        duration-ms 200
+        curve "ease-out-quad"
+    }
+
+    overview-open-close {
+        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+    }
+
+    recent-windows-close {
+        spring damping-ratio=1.0 stiffness=800 epsilon=0.001
+    }
+}
+
+window-rule {
+    geometry-corner-radius 0
+    clip-to-geometry true
+
+}
+
+window-rule {
+    match at-startup=true app-id="vesktop"
+    open-on-workspace "discord"
+}
+
+window-rule {
+    match at-startup=true app-id="firefox"
+    open-on-workspace "browser"
+}
+
+window-rule {
+    match at-startup=true app-id="dev.zed.Zed"
+    open-on-workspace "task"
+}
+
+window-rule {
+    match at-startup=true app-id="foot"
+    open-on-workspace "music"
+}
+
+window-rule {
+    match app-id="org.gnome.Nautilus"
+    open-floating true
+    open-focused true
+}
+
+window-rule {
+    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
+    open-floating true
+}
+
+window-rule {
+    match app-id="steam" title=r#"^notificationtoasts_\d+_desktop$"#
+    default-floating-position x=10 y=10 relative-to="bottom-right"
+}
+
+layer-rule {
+    match namespace="^awww-daemon-overview$"
+    place-within-backdrop true
+}
+
+binds {
+
+    Mod+Return { spawn "foot"; }
+    Mod+D { spawn "fuzzel"; }
+    // Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
+
+    XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.0 && sound-change"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1- && sound-change"; }
+    XF86AudioMute        allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle && sound-change"; }
+    XF86AudioMicMute     allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && mic-change"; }
+
+    XF86MonBrightnessUp allow-when-locked=true { spawn-sh "brightnessctl --class=backlight set +10% && brightness-change"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn-sh "brightnessctl --class=backlight set 10%- && brightness-change"; }
+
+    F12 { spawn-sh "show-date"; }
+
+    Mod+O repeat=false { toggle-overview; }
+    Mod+Q repeat=false { close-window; }
+
+    Mod+Left  { focus-column-left; }
+    Mod+Down     { focus-window-or-workspace-down; }
+    Mod+Up     { focus-window-or-workspace-up; }
+    Mod+Right { focus-column-right; }
+
+    Mod+Ctrl+Left  { move-column-left; }
+    Mod+Ctrl+Down     { move-window-down-or-to-workspace-down; }
+    Mod+Ctrl+Up     { move-window-up-or-to-workspace-up; }
+    Mod+Ctrl+Right { move-column-right; }
+
+    Mod+Page_Down      { focus-workspace-down; }
+    Mod+Page_Up        { focus-workspace-up; }
+    Mod+Ctrl+Page_Down { move-column-to-workspace-down; }
+    Mod+Ctrl+Page_Up   { move-column-to-workspace-up; }
+
+    Mod+Shift+Page_Down { move-workspace-down; }
+    Mod+Shift+Page_Up   { move-workspace-up; }
+
+    Mod+WheelScrollDown      cooldown-ms=150 { focus-workspace-down; }
+    Mod+WheelScrollUp        cooldown-ms=150 { focus-workspace-up; }
+    Mod+Ctrl+WheelScrollDown cooldown-ms=150 { move-column-to-workspace-down; }
+    Mod+Ctrl+WheelScrollUp   cooldown-ms=150 { move-column-to-workspace-up; }
+
+    Mod+WheelScrollRight      { focus-column-right; }
+    Mod+WheelScrollLeft       { focus-column-left; }
+    Mod+Ctrl+WheelScrollRight { move-column-right; }
+    Mod+Ctrl+WheelScrollLeft  { move-column-left; }
+
+    // Usually scrolling up and down with Shift in applications results in
+    // horizontal scrolling; these binds replicate that.
+    Mod+Shift+WheelScrollDown      { focus-column-right; }
+    Mod+Shift+WheelScrollUp        { focus-column-left; }
+    Mod+Ctrl+Shift+WheelScrollDown { move-column-right; }
+    Mod+Ctrl+Shift+WheelScrollUp   { move-column-left; }
+
+    Mod+1 { focus-workspace 1; }
+    Mod+2 { focus-workspace 2; }
+    Mod+3 { focus-workspace 3; }
+    Mod+4 { focus-workspace 4; }
+    Mod+5 { focus-workspace 5; }
+    Mod+6 { focus-workspace 6; }
+    Mod+7 { focus-workspace 7; }
+    Mod+8 { focus-workspace 8; }
+    Mod+9 { focus-workspace 9; }
+    Mod+Ctrl+1 { move-column-to-workspace 1; }
+    Mod+Ctrl+2 { move-column-to-workspace 2; }
+    Mod+Ctrl+3 { move-column-to-workspace 3; }
+    Mod+Ctrl+4 { move-column-to-workspace 4; }
+    Mod+Ctrl+5 { move-column-to-workspace 5; }
+    Mod+Ctrl+6 { move-column-to-workspace 6; }
+    Mod+Ctrl+7 { move-column-to-workspace 7; }
+    Mod+Ctrl+8 { move-column-to-workspace 8; }
+    Mod+Ctrl+9 { move-column-to-workspace 9; }
+
+    Mod+Comma  { consume-or-expel-window-left; }
+    Mod+Period { consume-or-expel-window-right; }
+
+    Mod+R { switch-preset-column-width; }
+    Mod+Shift+R { switch-preset-window-height; }
+
+    Mod+F { maximize-column; }
+    Mod+Shift+F { fullscreen-window; }
+    Mod+M { maximize-window-to-edges; }
+
+    Mod+Minus { set-column-width "-10%"; }
+    Mod+Equal { set-column-width "+10%"; }
+    Mod+Shift+Minus { set-window-height "-10%"; }
+    Mod+Shift+Equal { set-window-height "+10%"; }
+
+    Mod+S       { toggle-window-floating; }
+    Mod+W { toggle-column-tabbed-display; }
+
+    Print { screenshot; }
+    Ctrl+Print { screenshot-screen; }
+    Alt+Print { screenshot-window; }
+
+    Ctrl+Alt+Delete { spawn-sh "open-powermenu"; }
+
+    Mod+P { power-off-monitors; }
+}

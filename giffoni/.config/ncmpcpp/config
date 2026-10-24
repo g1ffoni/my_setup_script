@@ -1,6 +1,6 @@
 mpd_host = localhost
 mpd_port = 6600
-mpd_music_dir = ~/Music/Sorted
+mpd_music_dir = ~/Media/Music/Sorted
 
 visualizer_data_source = /tmp/mpd.fifo
 visualizer_output_name = my_fifo

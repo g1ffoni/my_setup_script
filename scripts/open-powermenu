@@ -1,0 +1,17 @@
+#!/bin/sh
+
+choice=$(printf '%s\n' \
+	"Lock" \
+	"Suspend" \
+	"Log Out" \
+	"Reboot" \
+	"Power Off" |
+	fuzzel --dmenu --lines 5 --width 20) || exit 0
+
+case "$choice" in
+	"Lock")      loginctl lock-session ;;
+	"Suspend")   systemctl suspend ;;
+	"Log Out")   niri msg action quit --skip-confirmation ;;
+	"Reboot")    systemctl reboot ;;
+	"Power Off") systemctl poweroff ;;
+esac
