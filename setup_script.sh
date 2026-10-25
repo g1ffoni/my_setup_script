@@ -11,13 +11,13 @@ install_apps() {
     APP_PKGS=(firefox zed nicotine+ nautilus vesktop gimp krita steam celluloid loupe)
 
     PACMAN_PKGS=("${BASE_PKGS[@]}" "${DESKTOP_PKGS[@]}" "${APP_PKGS[@]}")
-    PARU_PKGS=()
-    FLATPAK_PKGS=()
+    #PARU_PKGS=()
+    #FLATPAK_PKGS=()
 
     log "Installing packages..."
     sudo pacman -S --needed "${PACMAN_PKGS[@]}"
-    paru -S --needed "${PARU_PKGS[@]}"
-    flatpak install -y flathub "${FLATPAK_PKGS[@]}"
+    #paru -S --needed "${PARU_PKGS[@]}"
+    #flatpak install -y flathub "${FLATPAK_PKGS[@]}"
     #uv tool install beets
     log "Finished installing packages."
 }
@@ -27,7 +27,7 @@ configure_stuff() {
     mkdir -p "$HOME/.local/share/mpd/playlists"
     mkdir -p "$HOME/.local/state/mpd"
 
-    local SOURCES=(
+local SOURCES=(
         "Pictures/Wallpapers"
         ".config/niri"
         ".config/fastfetch"
@@ -41,9 +41,9 @@ configure_stuff() {
 
     log "Setting up dotfiles..."
     for src in "${SOURCES[@]}"; do
-        [[ -e "$HOME/$src" ]] && rm -rf "$HOME/$src"
+        rm -rf "$HOME/$src"
         mkdir -p "$(dirname "$HOME/$src")"
-        cp -r "$src" "$HOME/$src"
+        cp -r "giffoni/$src" "$HOME/$src"
     done
 
     log "Setting up system config files..."
@@ -86,9 +86,9 @@ giffoni_related() {
 
             log "Getting external hard drive files..."
             sudo mount /dev/sda1 /mnt
-            rsync -rtv --progress /mnt/Media $HOME/
-            rsync -rtv --progress /mnt/Code $HOME/
-            rsync -rtv --progress /mnt/.mpdscribble $HOME/
+            rsync -rtv --progress /mnt/home/giffoni/Media $HOME/
+            rsync -rtv --progress /mnt/home/giffoni/Code $HOME/
+            rsync -rtv --progress /mnt/home/giffoni/.mpdscribble $HOME/
             log "Unmounting external hard drive..."
             sudo umount /mnt
 

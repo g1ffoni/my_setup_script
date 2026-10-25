@@ -18,33 +18,6 @@ error() {
     exit 1
 }
 
-# usage: install_dotfile dotfile_source_dir dotfile_dest_dir
-install_dotfile() {
-    local src="${1%/}"
-    local dest="${2%/}"
-
-    [[ ! -d "$src" ]] && {
-        error "Source must be a directory."
-    }
-    [[ "$src" -ef "$dest" ]] && {
-        error "Source and destination must differ."
-    }
-
-    mkdir -p "$dest"
-
-    shopt -s dotglob nullglob
-
-    for dest_file in "$dest"/*; do
-        local backup="${dest_file}.bak.$(date +%Y%m%d%H%M%S)"
-        log "Backing up $dest_file -> $backup"
-        mv "$dest_file" "$backup"
-    done
-
-    shopt -u dotglob nullglob
-
-    cp -vr "$src/." "$dest"
-}
-
 check_deps() {
     local missing=()
 
